@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deep Learning for On-Field ACL Injury Forecasting</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="ACL Forecast home">
+      <span class="brand-mark">ACL</span>
+      <span>Injury Forecasting</span>
+    </a>
+    <nav class="section-nav" aria-label="Page sections">
+      <a href="#problem">Problem</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#sock">Wearable</a>
+      <a href="#pipeline">ML Pipeline</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#results">Results</a>
+      <a href="#publication">Paper</a>
+      <a href="#future">Future</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero section">
+      <div class="hero-media" aria-hidden="true">
+        <img src="assets/acl-hero.png" alt="" />
+      </div>
+      <div class="hero-shade"></div>
+      <div class="hero-grid">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Sports medicine + edge ML AND DL</p>
+          <h1>Deep Learning for On-Field ACL Injury Forecasting</h1>
+          <p class="hero-text">A wearable knee-sock system that streams movement, impact, and fatigue signals into a predictive model for real-time ACL injury-risk alerts during play.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#dashboard">View Live Dashboard</a>
+            <a class="button ghost" href="#architecture">Explore System</a>
+          </div>
+        </div>
+
+        <aside class="risk-console reveal" aria-label="Live injury risk preview">
+          <div class="console-top">
+            <span>ACL Risk Monitor</span>
+            <strong id="riskLabel">Moderate</strong>
+          </div>
+          <div class="risk-ring" style="--risk: 46">
+            <span id="riskValue">46%</span>
+          </div>
+          <div class="signal-stack">
+            <span style="--level: 72"></span>
+            <span style="--level: 45"></span>
+            <span style="--level: 88"></span>
+            <span style="--level: 56"></span>
+            <span style="--level: 64"></span>
+          </div>
+          <div class="metric-row">
+            <span>Knee valgus</span>
+            <b id="valgusMetric">12.4 deg</b>
+          </div>
+          <div class="metric-row">
+            <span>Landing impulse</span>
+            <b id="impulseMetric">2.1 kN</b>
+          </div>
+          <div class="metric-row">
+            <span>Fatigue drift</span>
+            <b id="fatigueMetric">18%</b>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section intro-band" id="problem">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Problem statement</p>
+        <h2>ACL injury risk changes before the injury event becomes visible.</h2>
+      </div>
+      <div class="problem-layout">
+        <article class="problem-card reveal">
+          <h3>On-field constraints</h3>
+          <p>Coaches and medical staff need warnings during drills and matches, where lab-grade motion capture is unavailable and decisions must happen in seconds.</p>
+        </article>
+        <article class="problem-card reveal">
+          <h3>Biomechanical signals</h3>
+          <p>Sudden cutting, landing asymmetry, high knee valgus, tibial acceleration, and accumulating fatigue can combine into a short risk window.</p>
+        </article>
+        <article class="problem-card reveal">
+          <h3>Forecasting objective</h3>
+          <p>The system estimates near-term ACL strain risk from time-series sensor data and classifies safe, caution, and intervention states.</p>
+        </article>
+      </div>
+      <div class="injury-video reveal">
+        <div class="video-copy">
+          <p class="eyebrow">Injury mechanism</p>
+          <h3>Why fast forecasting matters</h3>
+          <p>The reference video shows how non-contact ACL injuries can occur during rapid movement changes.</p>
+        </div>
+        <video src="assets/project/acl-injury-mechanism.mp4" controls muted preload="metadata" playsinline></video>
+      </div>
+    </section>
+
+    <section class="section" id="architecture">
+      <div class="section-heading reveal">
+        <p class="eyebrow">System architecture</p>
+        <h2>From knee-sock sensors to clinician-grade insight.</h2>
+      </div>
+      <div class="architecture-shell reveal">
+        <div class="arch-node active" data-arch="sensor">
+          <span>01</span>
+          <b>Sensor Layer</b>
+          <small>IMU, pressure, EMG, temperature</small>
+        </div>
+        <div class="arch-flow"></div>
+        <div class="arch-node" data-arch="edge">
+          <span>02</span>
+          <b>Edge Hub</b>
+          <small>Filtering, sync, feature windows</small>
+        </div>
+        <div class="arch-flow"></div>
+        <div class="arch-node" data-arch="model">
+          <span>03</span>
+          <b>Deep Model</b>
+          <small>CNN-LSTM + attention risk head</small>
+        </div>
+        <div class="arch-flow"></div>
+        <div class="arch-node" data-arch="action">
+          <span>04</span>
+          <b>Action Layer</b>
+          <small>Coach alert, rehab note, dashboard</small>
+        </div>
+      </div>
+      <div class="arch-detail reveal" id="archDetail">
+        <h3>Sensor Layer</h3>
+        <p>Low-profile modules capture acceleration, angular velocity, plantar pressure, and local muscle activation. Timestamp alignment keeps each movement phase comparable across athletes.</p>
+      </div>
+      <div class="media-showcase reveal">
+        <figure class="media-card wide">
+          <img src="assets/project/block-diagram.png" alt="Block diagram showing sensor layer, Arduino Uno microcontroller, ML processing layer, and output alert layer" />
+          <figcaption>
+            <b>Project block diagram</b>
+            <span>Sensor readings pass through Arduino Uno, model processing, decision logic, and alert/display outputs.</span>
+          </figcaption>
+        </figure>
+        <figure class="media-card">
+          <img src="assets/project/system-model.png" alt="Prototype system model with Arduino, sensors, LCD display, and wearable knee sock" />
+          <figcaption>
+            <b>System model prototype</b>
+            <span>Physical integration of display, controller, sensors, and wearable knee support.</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section split" id="sock">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Wearable knee sock design</p>
+        <h2>A washable compression sleeve with clinical sensing zones.</h2>
+      </div>
+      <div class="sock-lab reveal">
+        <div class="sock-diagram" role="img" aria-label="Interactive wearable knee sock sensor diagram">
+          <div class="leg-shape"></div>
+          <button class="hotspot active" style="--x:48%;--y:21%" data-hotspot="imu" aria-label="IMU sensor"></button>
+          <button class="hotspot" style="--x:59%;--y:43%" data-hotspot="valgus" aria-label="Valgus strain band"></button>
+          <button class="hotspot" style="--x:38%;--y:61%" data-hotspot="emg" aria-label="EMG zone"></button>
+          <button class="hotspot" style="--x:53%;--y:80%" data-hotspot="pressure" aria-label="Pressure sync"></button>
+        </div>
+        <div class="hotspot-panel" id="hotspotPanel">
+          <span>Primary sensor</span>
+          <h3>6-axis IMU pod</h3>
+          <p>Tracks tibial acceleration, knee rotation velocity, landing shock, and deceleration spikes during cutting and jump landings.</p>
+        </div>
+      </div>
+      <div class="brace-gallery reveal">
+        <figure class="media-card">
+          <img src="assets/project/knee-brace-model.png" alt="Wearable knee brace prototype mounted on a leg with sensors and wires" />
+          <figcaption>
+            <b>Model on knee brace</b>
+            <span>On-body placement of the sensing module for real movement capture.</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="pipeline">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Machine learning pipeline</p>
+        <h2>Time-series learning built for messy sports data.</h2>
+      </div>
+      <div class="pipeline reveal">
+        <button class="stage active" data-stage="1">
+          <span>1</span>
+          <b>Acquire</b>
+        </button>
+        <button class="stage" data-stage="2">
+          <span>2</span>
+          <b>Clean</b>
+        </button>
+        <button class="stage" data-stage="3">
+          <span>3</span>
+          <b>Window</b>
+        </button>
+        <button class="stage" data-stage="4">
+          <span>4</span>
+          <b>Train</b>
+        </button>
+        <button class="stage" data-stage="5">
+          <span>5</span>
+          <b>Forecast</b>
+        </button>
+      </div>
+      <div class="pipeline-detail reveal" id="pipelineDetail">
+        <h3>Acquire multimodal streams</h3>
+        <p>Collect synchronized IMU, pressure, EMG, and fatigue markers at session level, with athlete metadata separated from model inputs for privacy-aware analysis.</p>
+      </div>
+      <figure class="media-card flowchart-card reveal">
+        <img src="assets/project/system-flowchart.png" alt="System flowchart from sensor initialization through threshold checks, alerts, live graph updates, and data logging" />
+        <figcaption>
+          <b>Embedded monitoring flowchart</b>
+          <span>Sensor values are filtered, compared to model-derived thresholds, displayed live, logged, and routed to buzzer alerts when risk thresholds are crossed.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="section dashboard-section" id="dashboard">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Live dashboard</p>
+        <h2>Sideline decisions from a changing risk field.</h2>
+      </div>
+      <div class="dashboard reveal">
+        <div class="dash-toolbar">
+          <button class="active" data-mode="training">Training</button>
+          <button data-mode="match">Match</button>
+          <button data-mode="rehab">Rehab</button>
+        </div>
+        <div class="field-map">
+          <span class="athlete-dot" style="--x:20%;--y:37%;--delay:.1s"></span>
+          <span class="athlete-dot caution" style="--x:48%;--y:52%;--delay:.5s"></span>
+          <span class="athlete-dot danger" style="--x:72%;--y:31%;--delay:.25s"></span>
+          <span class="athlete-dot" style="--x:63%;--y:71%;--delay:.8s"></span>
+        </div>
+        <div class="dash-panel">
+          <h3 id="dashTitle">Training load scan</h3>
+          <p id="dashCopy">Monitors drill intensity and flags asymmetry when repeated cuts increase tibial rotation beyond personal baseline.</p>
+          <div class="timeline">
+            <span style="--h:34%"></span>
+            <span style="--h:52%"></span>
+            <span style="--h:41%"></span>
+            <span style="--h:76%"></span>
+            <span style="--h:62%"></span>
+            <span style="--h:88%"></span>
+            <span style="--h:57%"></span>
+            <span style="--h:49%"></span>
+          </div>
+        </div>
+        <figure class="media-card output-card">
+          <img src="assets/project/serial-output.png" alt="Serial output showing MEMS readings, heart rate, temperature, EMG value, and knee injury status" />
+          <figcaption>
+            <b>Prototype output</b>
+            <span>Live console readings show EMG, MEMS axes, heart rate, temperature, and injury status states.</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="results">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Results</p>
+        <h2>Research metrics designed for prevention, not just prediction.</h2>
+      </div>
+      <div class="results-grid">
+        <article class="result-card reveal">
+          <strong data-count="91">0</strong>
+          <span>Risk classification accuracy</span>
+        </article>
+        <article class="result-card reveal">
+          <strong data-count="38">0</strong>
+          <span>Earlier fatigue-risk detection</span>
+        </article>
+        <article class="result-card reveal">
+          <strong data-count="120">0</strong>
+          <span>ms edge inference target</span>
+        </article>
+        <article class="result-card reveal">
+          <strong data-count="3">0</strong>
+          <span>Alert levels for action</span>
+        </article>
+      </div>
+      <figure class="media-card quantitative-card reveal">
+        <img src="assets/project/quantitative-analysis.png" alt="Quantitative performance evaluation table for EMG, heart rate, temperature, gyroscope, acceleration, and QHR test scenarios" />
+        <figcaption>
+          <b>Quantitative performance analysis</b>
+          <span>Bench and on-body tests validate threshold detection, alert triggering, system reading ranges, and latency targets.</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="section publication" id="publication">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Published paper</p>
+        <h2>Research published in IRE Journals.</h2>
+      </div>
+      <div class="publication-layout reveal">
+        <a class="paper-preview" href="https://www.irejournals.com/paper-details/1717153" target="_blank" rel="noreferrer" aria-label="Open published paper in IRE Journals">
+          <img src="assets/project/published-paper.png" alt="First page of the published ACL injury forecasting research paper" />
+        </a>
+        <div class="paper-copy">
+          <p class="eyebrow">Volume 9 Issue 10</p>
+          <h3>A Deep Learning Approach for Predicting On-Field Anterior Cruciate Ligament Injuries Using Wearable Sensors</h3>
+          <p>The publication anchors the prototype in a formal research contribution, covering wearable sensor fusion, classifier evaluation, and real-time ACL injury-risk prediction.</p>
+          <a class="button paper-button" href="https://www.irejournals.com/paper-details/1717153" target="_blank" rel="noreferrer">Open Published Paper</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section applications">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Applications</p>
+        <h2>Where the platform fits.</h2>
+      </div>
+      <div class="application-strip reveal">
+        <span>Elite sports screening</span>
+        <span>Academy injury prevention</span>
+        <span>Return-to-play monitoring</span>
+        <span>Remote physiotherapy</span>
+        <span>Biomechanics research</span>
+      </div>
+    </section>
+
+    <section class="section future" id="future">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Future scope</p>
+        <h2>From forecasting to personalized prevention.</h2>
+      </div>
+      <div class="future-grid">
+        <article class="future-item reveal">
+          <h3>Federated model training</h3>
+          <p>Improve generalization across teams without pooling identifiable athlete data.</p>
+        </article>
+        <article class="future-item reveal">
+          <h3>Explainable risk factors</h3>
+          <p>Show which movement phase, joint angle, or fatigue marker triggered a high-risk forecast.</p>
+        </article>
+        <article class="future-item reveal">
+          <h3>Adaptive feedback</h3>
+          <p>Connect alerts to warm-up changes, substitution guidance, and rehab plan adjustments.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Deep Learning for On-Field ACL Injury Forecasting</p>
+    <span>Research project website prototype</span>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
